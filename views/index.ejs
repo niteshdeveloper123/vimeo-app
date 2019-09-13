@@ -10,7 +10,8 @@
 </head>
 <body>
   <div class="container">
-    <h1>File Upload</h1>
+    <h1 style="display: inline-block;" class="mt-2">File Upload</h1> 
+    <a style="float: right;" class="mt-3" href="/">Logout</a>
     <%= typeof msg != 'undefined' ? msg : '' %>
     <form action="/upload" method="POST" enctype="multipart/form-data">
       <div class="file-field input-field">
