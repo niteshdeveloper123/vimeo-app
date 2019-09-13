@@ -17,7 +17,10 @@ const storage = multer.diskStorage({
     cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
-mongoose.connect('mongodb://localhost/video-videos');
+
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/video-videos';
+
+mongoose.connect(MONGODB_URI);
 
 var db = mongoose.connection;
 
