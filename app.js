@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const MONGODB_URI = 'mongodb://vimeoapp:test@123@ds223509.mlab.com:23509/heroku_s6gmmjp2';
+const MONGODB_URI = 'mongodb://test:test123@ds143156.mlab.com:43156/heroku_vhsfb0r8';
 
 mongoose.connect(MONGODB_URI);
 
