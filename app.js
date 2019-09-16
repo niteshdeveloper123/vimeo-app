@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const MONGODB_URI = 'mongodb://test:test123@ds143156.mlab.com:43156/heroku_vhsfb0r8';
+const MONGODB_URI = 'mongodb://localhost/video-videos';
 
 mongoose.connect(MONGODB_URI);
 
@@ -34,7 +34,7 @@ const upload = multer({
   fileFilter: function(req, file, cb){
     checkFileType(file, cb);
   }
-}).single('myImage');
+}).single('myFlie');
 
 // Check File Type
 function checkFileType(file, cb){
@@ -107,10 +107,15 @@ app.post('/upload', (req, res) => {
           msg: 'Error: No File Selected!'
         });
       } else {
-        res.render('index', {
-          msg: 'File Uploaded!',
-          file: `uploads/${req.file.filename}`
-        });
+        client.request({
+          method: 'GET',
+          path: '/tutorial'
+        }, function (error, body, status_code, headers) {
+        if (error) {
+          console.log(error);
+        }
+          console.log(body);
+        })
         var videoFile = './public/uploads/'+req.file.filename;
         client.upload(
           videoFile,
@@ -141,6 +146,11 @@ app.post('/upload', (req, res) => {
             if (bytes_uploaded == bytes_total)
             {
               fs.unlinkSync(videoFile);
+
+              res.render('index', {
+                msg: 'File Uploaded!',
+                file: `uploads/${req.file.filename}`
+              });
             }
           },
           function (error) {
