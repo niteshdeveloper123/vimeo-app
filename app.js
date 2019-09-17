@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const MONGODB_URI = 'mongodb://localhost/video-videos';
+const MONGODB_URI = 'mongodb+srv://video-one:video@cluster0-z6jcp.gcp.mongodb.net/test';
 
 mongoose.connect(MONGODB_URI);
 
@@ -155,12 +155,153 @@ app.post('/upload', (req, res) => {
           },
           function (error) {
             console.log('Failed because: ' + error)
-          }
-        )   
+          })   
       }
     }
   });
 });
+
+
+app.post('/disable', (req, res) => {
+
+  upload(req, res, (err) => {
+    if(err){
+      res.render('index', {
+        msg: err
+      });
+    } else {
+      if(req.file == undefined){
+        res.render('index', {
+          msg: 'Error: No File Selected!'
+        });
+      } else {
+        client.request({
+          method: 'GET',
+          path: '/tutorial'
+        }, function (error, body, status_code, headers) {
+        if (error) {
+          console.log(error);
+        }
+          console.log(body);
+        })
+        var videoFile = './public/uploads/'+req.file.filename;
+          
+        client.upload(
+          videoFile,
+          {
+            'name': req.body.name,
+            'description': req.body.description,
+            'path': 'http://localhost:8080',
+            'privacy': {
+                        'embed': 'whitelist'
+                      }
+          },
+          function (uri) {
+            console.log('Your video URI is: ' + uri);
+            var video = new Video();
+
+            video.videourl = uri;
+            video.videopassword = req.body.vidpassword;
+            video.name = req.body.name;
+            video.description = req.body.description;
+            video.save(function (err, video) {
+              if (err)
+                console.log(err);
+            });
+          },
+          function (bytes_uploaded, bytes_total) {
+            var percentage = (bytes_uploaded / bytes_total * 100).toFixed(2)
+            console.log(bytes_uploaded, bytes_total, percentage + '%');
+            if (bytes_uploaded == bytes_total)
+            {
+              fs.unlinkSync(videoFile);
+
+              res.render('index', {
+                msg: 'File Uploaded!',
+                file: `uploads/${req.file.filename}`
+              });
+            }
+          },
+          function (error) {
+            console.log('Failed because: ' + error)
+          }) 
+      }
+    }
+  });
+
+});
+
+app.post('/nobody', (req, res) => {
+
+  upload(req, res, (err) => {
+    if(err){
+      res.render('index', {
+        msg: err
+      });
+    } else {
+      if(req.file == undefined){
+        res.render('index', {
+          msg: 'Error: No File Selected!'
+        });
+      } else {
+        client.request({
+          method: 'GET',
+          path: '/tutorial'
+        }, function (error, body, status_code, headers) {
+        if (error) {
+          console.log(error);
+        }
+          console.log(body);
+        })
+        var videoFile = './public/uploads/'+req.file.filename;
+        client.upload(
+          videoFile,
+          {
+            'name': req.body.name,
+            'description': req.body.description,
+            'privacy': {
+                    'view': 'nobody'
+            },
+          },
+          function (uri) {
+            console.log('Your video URI is: ' + uri);
+            var video = new Video();
+
+            video.videourl = uri;
+            video.videopassword = req.body.vidpassword;
+            video.name = req.body.name;
+            video.description = req.body.description;
+            video.save(function (err, video) {
+              if (err)
+                console.log(err);
+            });
+          },
+          function (bytes_uploaded, bytes_total) {
+            var percentage = (bytes_uploaded / bytes_total * 100).toFixed(2)
+            console.log(bytes_uploaded, bytes_total, percentage + '%');
+            if (bytes_uploaded == bytes_total)
+            {
+              fs.unlinkSync(videoFile);
+
+              res.render('index', {
+                msg: 'File Uploaded!',
+                file: `uploads/${req.file.filename}`
+              });
+            }
+          },
+          function (error) {
+            console.log('Failed because: ' + error)
+          })   
+      }
+    }
+  });
+
+})
+
+
+
+
+
 
 
 app.get('/get-videos', (req, res) => { 
@@ -171,32 +312,8 @@ app.get('/get-videos', (req, res) => {
     }
     else{
           res.render('videos', { videoid: videos });
-          // videos.forEach(video => {
-
-          //     // client.request({
-          //     //   method: 'GET',
-          //     //   path: video.videourl,
-          //     //   query: {
-          //     //     'privacy': {
-          //     //       'view': 'password'
-          //     //     },
-          //     //     'password': video.videopassword
-          //     //   }
-          //     // },
-          //     //   function (error, body, status_code, headers) {
-          //     //     if (error) {
-          //     //       console.log('error');
-          //     //       console.log(error);
-          //     //     } else {
-          //     //       vidlink.push(body.link);
-          //     //     }
-          //     //   });
-
-          // });
     }
   });
-
-    // console.log(vidlink);
 });
 
 const PORT = process.env.PORT || 8080;
